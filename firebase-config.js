@@ -1,16 +1,10 @@
-// Biarkan `null` untuk mode DEMO (data tersimpan di browser saja).
-// Untuk memakai Firestore, ganti dengan config dari Firebase Console:
-// Project settings > General > Your apps > Web app > SDK setup and configuration.
-//
-// Contoh:
-// export default {
-//   apiKey: "AIza...",
-//   authDomain: "nama-project.firebaseapp.com",
-//   projectId: "nama-project",
-//   storageBucket: "nama-project.appspot.com",
-//   messagingSenderId: "1234567890",
-//   appId: "1:1234567890:web:abcdef"
-// };
-// (Config ini memang boleh publik; yang menjaga data adalah firestore.rules.)
-
-export default null;
+// Config web Firebase (boleh publik; data dijaga oleh aturan Firestore).
+export default {
+  apiKey: "AIzaSyDbwwgMKxGMO9LnPwyf9ipS-DtPLLSggwU",
+  authDomain: "lapakoffice-b3009.firebaseapp.com",
+  projectId: "lapakoffice-b3009",
+  storageBucket: "lapakoffice-b3009.firebasestorage.app",
+  messagingSenderId: "392980542245",
+  appId: "1:392980542245:web:6ce9e5230370fa30dee0cc",
+  measurementId: "G-2MB1TB3H7T"
+};
