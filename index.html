@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lapak Office</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#16181d;--mute:#6b7280;--line:#e5e7eb;--brand:#2563eb;--brand-ink:#fff;--ok:#16a34a;--warn:#d97706;--bad:#dc2626;--soft:#eef2ff}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1115;--panel:#171a21;--ink:#e8eaee;--mute:#9aa3b2;--line:#2a2f3a;--brand:#5b8cff;--brand-ink:#0b1020;--soft:#1c2540}}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit;color:inherit}
+input,select,textarea{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%}
+textarea{resize:vertical;min-height:70px}
+input[type=checkbox]{width:auto}
+input[type=range]{padding:0}
+button{cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:7px 12px}
+button:hover{border-color:var(--brand)}
+button.pri{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+button.bad{color:var(--bad)}
+.sm{font-size:12px}
+.muted{color:var(--mute)}
+.shell{display:grid;grid-template-columns:228px 1fr;min-height:100vh}
+.side{background:var(--panel);border-right:1px solid var(--line);padding:16px 12px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+.brand{font-weight:700;font-size:17px;padding:4px 10px 14px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav a{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:8px;color:var(--ink);text-decoration:none}
+.nav a.on{background:var(--soft);color:var(--brand);font-weight:600}
+.me{margin-top:auto;border-top:1px solid var(--line);padding-top:12px}
+main{padding:24px;min-width:0}
+.h{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+h1{font-size:20px;margin:0}
+h3{margin:0 0 8px;font-size:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.row{display:flex;align-items:center;gap:8px}.sb{justify-content:space-between}.wrap{flex-wrap:wrap}
+.stat b{font-size:26px;display:block}
+.chip{display:inline-block;font-size:11px;padding:1px 8px;border-radius:99px;color:var(--c,var(--mute));border:1px solid currentColor;white-space:nowrap}
+.av{display:inline-grid;place-items:center;width:var(--s,28px);height:var(--s,28px);border-radius:50%;color:#fff;font-size:calc(var(--s,28px)*.4);font-weight:600;flex:none}
+.bar{height:6px;background:var(--line);border-radius:9px;overflow:hidden;min-width:60px;flex:1}.bar i{display:block;height:100%;background:var(--brand)}
+.board{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:12px;overflow-x:auto;padding-bottom:8px}
+.col{background:color-mix(in srgb,var(--line) 35%,transparent);border-radius:12px;padding:10px;min-height:200px;display:flex;flex-direction:column;gap:8px}
+.col.over{outline:2px dashed var(--brand)}
+.task{cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:10px}
+.item{cursor:pointer;display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border:0}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:middle}th{font-size:12px;color:var(--mute);font-weight:600}
+.scroll{overflow-x:auto}
+.tabs{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}.tabs button.on{background:var(--soft);color:var(--brand);border-color:var(--brand)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.filters>*{width:auto;min-width:130px}
+#modal .back{position:fixed;inset:0;background:#0008;display:grid;place-items:start center;padding:4vh 12px;overflow:auto;z-index:20}
+.dlg{background:var(--panel);border-radius:14px;width:min(720px,100%);padding:20px;border:1px solid var(--line)}
+label{display:block;font-size:12px;color:var(--mute);margin:10px 0 4px}
+.frm2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.checks{display:flex;flex-wrap:wrap;gap:6px 14px}.checks label{display:flex;gap:6px;align-items:center;margin:0;color:var(--ink);font-size:13px}
+.tree{margin-left:18px;border-left:2px solid var(--line);padding-left:14px;margin-top:10px}
+.chat{display:grid;grid-template-columns:230px 1fr;height:calc(100vh - 110px);gap:12px}
+.chlist{overflow:auto;display:flex;flex-direction:column;gap:2px}
+.chlist button{text-align:left;border:0;background:none;display:flex;gap:8px;align-items:center}.chlist button.on{background:var(--soft);color:var(--brand)}
+.chlist h4{margin:10px 8px 2px;font-size:11px;text-transform:uppercase;color:var(--mute)}
+.chatbox{display:flex;flex-direction:column;min-height:0}
+.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:4px 2px 12px}
+.msg{display:flex;gap:10px}.msg p{margin:2px 0 0;white-space:pre-wrap;word-break:break-word}
+.banner{background:var(--soft);border:1px solid var(--brand);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.login{max-width:380px;margin:8vh auto;padding:0 14px}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:99px;z-index:50;display:none}
+@media(max-width:820px){
+ .shell{grid-template-columns:1fr}
+ .side{position:static;height:auto;flex-direction:row;overflow-x:auto;align-items:center;border-right:0;border-bottom:1px solid var(--line)}
+ .nav{flex-direction:row}.brand{padding:0 8px}.me{margin:0 0 0 auto;border:0;padding:0}
+ main{padding:14px}.chat{grid-template-columns:1fr;height:auto}.chlist{max-height:140px}.msgs{max-height:55vh}
+ .frm2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="modal"></div><div id="toast"></div>
+<script type="module">
+import cfg from './firebase-config.js';
+
+/* ============ util ============ */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dstr=ts=>new Date(ts).toLocaleDateString('sv-SE');
+const today=()=>dstr(Date.now());
+const fmtDate=s=>s?new Date(typeof s==='string'?s+'T00:00:00':s).toLocaleDateString('id-ID',{day:'numeric',month:'short'}):'–';
+const fmtTime=ts=>new Date(ts).toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
+const ago=ts=>{const m=Math.round((Date.now()-ts)/6e4);if(m<1)return'baru saja';if(m<60)return m+' mnt lalu';const h=Math.round(m/60);if(h<24)return h+' jam lalu';const d=Math.round(h/24);return d<7?d+' hari lalu':fmtDate(ts)};
+const hash=s=>[...String(s)].reduce((a,c)=>(a*31+c.charCodeAt(0))>>>0,7);
+function toast(m){const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',3200)}
+const PRI={low:['Rendah','#6b7280'],med:['Sedang','#d97706'],high:['Tinggi','#dc2626']};
+const ST={todo:'Belum mulai',doing:'Dikerjakan',review:'Review',done:'Selesai'};
+const ROLE={admin:'Admin',manager:'Atasan',staff:'Staf'};
+
+/* ============ data layer: Firestore atau Demo ============ */
+async function makeFirebase(cfg){
+  const V='10.12.2',B=`https://www.gstatic.com/firebasejs/${V}/`;
+  const [{initializeApp},A,F]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
+  const app=initializeApp(cfg),auth=A.getAuth(app),fs=F.getFirestore(app);
+  return{
+    mode:'firebase',
+    sub(path,cb,opts){
+      const col=F.collection(fs,path);
+      const q=opts?.where?F.query(col,F.where(opts.where[0],'==',opts.where[1])):col;
+      return F.onSnapshot(q,s=>cb(s.docs.map(d=>({id:d.id,...d.data()}))),e=>{console.error(e);toast('Gagal memuat '+path+' ('+e.code+')')});
+    },
+    add:(p,d)=>F.addDoc(F.collection(fs,p),{...d,createdAt:Date.now()}),
+    set:(p,id,d)=>F.setDoc(F.doc(fs,p,id),{createdAt:Date.now(),...d},{merge:true}),
+    update:(p,id,d)=>F.updateDoc(F.doc(fs,p,id),d),
+    del:(p,id)=>F.deleteDoc(F.doc(fs,p,id)),
+    bootstrapAdmin(uid,d){const b=F.writeBatch(fs);b.set(F.doc(fs,'users',uid),{createdAt:Date.now(),...d});b.set(F.doc(fs,'meta','bootstrap'),{by:uid,at:Date.now()});return b.commit()},
+    onAuth:cb=>A.onAuthStateChanged(auth,u=>cb(u?{uid:u.uid,email:u.email}:null)),
+    login:(e,p)=>A.signInWithEmailAndPassword(auth,e,p),
+    register:(e,p)=>A.createUserWithEmailAndPassword(auth,e,p),
+    logout:()=>A.signOut(auth),
+  };
+}
+function seed(){
+  const now=Date.now(),D=n=>new Date(now+n*864e5).toLocaleDateString('sv-SE'),T=n=>now+n*864e5;
+  const divisions=[
+    {id:'d1',name:'Direksi',parentId:null,headId:'u1'},
+    {id:'d2',name:'IT',parentId:'d1',headId:'u2'},
+    {id:'d3',name:'Marketing',parentId:'d1',headId:'u5'},
+    {id:'d4',name:'HR & Finance',parentId:'d1',headId:'u8'}];
+  const mk=(id,name,role,div,title,mgr)=>({id,name,role,divisionId:div,title,managerId:mgr,email:id+'@demo.id',createdAt:now});
+  const users=[mk('u1','Budi Santoso','admin','d1','Direktur',null),mk('u2','Rina Wijaya','manager','d2','Head of IT','u1'),mk('u3','Dimas Pratama','staff','d2','Backend Developer','u2'),mk('u4','Sari Lestari','staff','d2','UI Designer','u2'),mk('u5','Andre Kusuma','manager','d3','Marketing Manager','u1'),mk('u6','Maya Putri','staff','d3','Content Specialist','u5'),mk('u7','Fajar Nugroho','staff','d3','Sales Executive','u5'),mk('u8','Lina Hartono','manager','d4','HR & Finance Manager','u1'),mk('u9','Tono Wibowo','staff','d4','Akuntan','u8')];
+  let n=0;
+  const t=(title,as,div,collab,status,due,pri,prog,o={})=>{const a=users.find(u=>u.id===as);return{id:'t'+(++n),title,desc:o.desc||'',assigneeId:as,creatorId:a.managerId||as,divisionId:div,collabDivisionIds:collab,linkedTaskIds:o.linked||[],status,due:D(due),priority:pri,progress:prog,rating:o.rating||null,doneAt:o.doneAt?T(o.doneAt):null,createdAt:T(-14)}};
+  const tasks=[
+    t('Redesign halaman landing','u4','d2',['d3'],'doing',3,'high',60,{linked:['t2'],desc:'Redesign landing page produk baru, koordinasi konten dengan Marketing.'}),
+    t('Copywriting landing page baru','u6','d3',['d2'],'doing',2,'med',40,{linked:['t1']}),
+    t('Integrasi API pembayaran','u3','d2',['d4'],'review',0,'high',90),
+    t('Rekonsiliasi transaksi payment gateway','u9','d4',['d2'],'todo',5,'med',0,{linked:['t3']}),
+    t('Optimasi query dashboard','u3','d2',[],'done',-5,'med',100,{doneAt:-6,rating:5}),
+    t('Setup staging server','u3','d2',[],'done',-12,'low',100,{doneAt:-10,rating:4}),
+    t('Kampanye Instagram November','u6','d3',[],'done',-8,'med',100,{doneAt:-9,rating:4}),
+    t('Laporan penjualan bulanan','u7','d3',[],'doing',-2,'high',30),
+    t('Follow-up 20 prospek B2B','u7','d3',[],'done',-4,'med',100,{doneAt:-4,rating:3}),
+    t('Laporan pajak bulanan','u9','d4',[],'done',-3,'high',100,{doneAt:-4,rating:5}),
+    t('Rapikan arsip kontrak','u9','d4',[],'doing',-1,'low',20),
+    t('Desain ulang icon set','u4','d2',[],'done',-7,'med',100,{doneAt:-8,rating:5}),
+    t('Evaluasi vendor hosting','u2','d2',['d4'],'doing',7,'med',20),
+    t('Budget kampanye Q1','u5','d3',['d4'],'todo',10,'med',0),
+    t('Rekrutmen QA Engineer','u8','d4',['d2'],'doing',14,'med',50)];
+  const reports=[
+    {id:'r1',taskId:'t1',userId:'u4',type:'progress',text:'Wireframe selesai, mulai high-fidelity untuk hero & pricing.',progress:60,createdAt:T(-1)},
+    {id:'r2',taskId:'t2',userId:'u6',type:'progress',text:'Draft headline & CTA sudah, menunggu masukan visual dari tim desain.',progress:40,createdAt:T(-0.5)},
+    {id:'r3',taskId:'t3',userId:'u3',type:'progress',text:'Integrasi sandbox lolos, tinggal uji webhook di staging.',progress:90,createdAt:T(-0.3)},
+    {id:'r4',taskId:null,userId:'u7',type:'daily',text:'Hari ini follow-up 6 prospek, 2 minta penawaran.',progress:null,createdAt:T(-0.2)}];
+  const messages=[
+    {id:'m1',channel:'general',uid:'u1',text:'Selamat datang di Lapak Office! Update tugas dan laporan lewat sini ya.',createdAt:T(-2)},
+    {id:'m2',channel:'div:d2',uid:'u2',text:'Tim IT, deadline integrasi pembayaran hari ini. Tolong dibantu review.',createdAt:T(-1)}];
+  return{users,divisions,tasks,reports,messages};
+}
+function makeDemo(){
+  const KEY='lapak_demo_v1';
+  let db=JSON.parse(localStorage.getItem(KEY)||'null')||seed();
+  const subs=new Set();let authCb=null,cur=localStorage.getItem(KEY+'_me');
+  const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
+  const notify=()=>subs.forEach(f=>f());
+  const rows=(p,o)=>{let r=db[p]||[];if(o?.where)r=r.filter(x=>x[o.where[0]]===o.where[1]);return r.map(x=>({...x}))};
+  return{
+    mode:'demo',
+    sub(p,cb,o){const f=()=>cb(rows(p,o));subs.add(f);setTimeout(f,0);return()=>subs.delete(f)},
+    async add(p,d){(db[p]??=[]).push({...d,id:'x'+Math.random().toString(36).slice(2,9),createdAt:Date.now()});save();notify()},
+    async set(p,id,d){const a=(db[p]??=[]);const r=a.find(x=>x.id===id);r?Object.assign(r,d):a.push({createdAt:Date.now(),...d,id});save();notify()},
+    async update(p,id,d){Object.assign(db[p].find(x=>x.id===id),d);save();notify()},
+    async del(p,id){db[p]=db[p].filter(x=>x.id!==id);save();notify()},
+    onAuth(cb){authCb=cb;setTimeout(()=>cb(cur?{uid:cur,email:cur+'@demo.id'}:null),0);return()=>{}},
+    async login(email){const u=db.users.find(x=>x.email===email);if(!u)throw Error('Pengguna tidak ditemukan');cur=u.id;localStorage.setItem(KEY+'_me',cur);authCb({uid:cur,email})},
+    async logout(){cur=null;localStorage.removeItem(KEY+'_me');authCb(null)},
+    demoUsers:()=>db.users,
+    reset(){localStorage.removeItem(KEY);localStorage.removeItem(KEY+'_me');location.reload()},
+  };
+}
+const store=cfg?await makeFirebase(cfg):makeDemo();
+
+/* ============ state ============ */
+const S={auth:null,me:null,users:[],divisions:[],tasks:[],reports:[],chat:[],ch:'general',
+  f:{view:'board',q:'',who:'all',div:'all'},orgTab:'div',repTab:'all',repUser:'all',kpiRange:30,modal:null,pendingName:''};
+let unsubs=[],chatUnsub=null,creating=false,raf=0;
+const sched=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(render)};
+const U=id=>S.users.find(u=>u.id===id),Dv=id=>S.divisions.find(d=>d.id===id);
+const isAdmin=()=>S.me.role==='admin',isMgr=()=>S.me.role==='manager'||isAdmin();
+const route=()=>location.hash.replace('#/','')||'dashboard';
+
+/* ============ scope & izin ============ */
+function descDivs(id){const out=[id];S.divisions.filter(d=>d.parentId===id).forEach(c=>out.push(...descDivs(c.id)));return out}
+function scopeDivs(){if(isAdmin())return S.divisions.map(d=>d.id);const m=S.me;if(!m.divisionId)return[];return m.role==='manager'?descDivs(m.divisionId):[m.divisionId]}
+function subordinates(id,seen=new Set()){S.users.filter(u=>u.managerId===id&&!seen.has(u.id)).forEach(u=>{seen.add(u.id);subordinates(u.id,seen)});return seen}
+function scopeUserIds(){
+  if(isAdmin())return new Set(S.users.map(u=>u.id));
+  const ids=new Set([S.me.id]);
+  if(S.me.role==='manager'){const ds=scopeDivs();S.users.filter(u=>ds.includes(u.divisionId)).forEach(u=>ids.add(u.id));subordinates(S.me.id).forEach(i=>ids.add(i))}
+  return ids;
+}
+function visibleTasks(){
+  if(isAdmin())return S.tasks;
+  const me=S.me,su=scopeUserIds(),ds=new Set(scopeDivs());
+  return S.tasks.filter(t=>t.assigneeId===me.id||t.creatorId===me.id||ds.has(t.divisionId)||su.has(t.assigneeId)||(t.collabDivisionIds||[]).some(d=>ds.has(d)));
+}
+function visibleReports(){
+  const su=scopeUserIds(),tv=new Set(visibleTasks().map(t=>t.id));
+  return S.reports.filter(r=>su.has(r.userId)||r.userId===S.me.id||(r.taskId&&tv.has(r.taskId)));
+}
+function canManage(t){if(isAdmin())return true;if(S.me.role!=='manager')return false;return scopeUserIds().has(t.assigneeId)||scopeDivs().includes(t.divisionId)}
+const canEdit=t=>canManage(t)||t.creatorId===S.me.id;
+function canMove(t,to){
+  if(canManage(t))return true;
+  if(t.assigneeId!==S.me.id&&t.creatorId!==S.me.id)return false;
+  const ok={todo:['doing'],doing:['todo','review'],review:['doing'],done:[]};
+  return(ok[t.status]||[]).includes(to);
+}
+const isOverdue=t=>t.status!=='done'&&t.due&&t.due<today();
+const linkedOf=t=>{const ids=new Set(t.linkedTaskIds||[]);S.tasks.forEach(x=>{if((x.linkedTaskIds||[]).includes(t.id))ids.add(x.id)});return[...ids].map(id=>S.tasks.find(x=>x.id===id)).filter(Boolean)};
+
+/* ============ KPI ============ */
+function kpiFor(uid,range){
+  const since=range?Date.now()-range*864e5:0;
+  const ts=S.tasks.filter(t=>t.assigneeId===uid&&(t.due?new Date(t.due+'T00:00:00').getTime():t.createdAt)>=since);
+  if(!ts.length)return null;
+  const done=ts.filter(t=>t.status==='done'),od=ts.filter(isOverdue),matured=done.length+od.length;
+  const reports=S.reports.filter(r=>r.userId===uid&&r.createdAt>=since).length;
+  const base={total:ts.length,done:done.length,overdue:od.length,reports,score:null};
+  if(!matured)return base;
+  const completion=done.length/matured;
+  const onTime=done.length?done.filter(t=>!t.due||dstr(t.doneAt)<=t.due).length/done.length:0;
+  const rated=done.filter(t=>t.rating);
+  const avgRating=rated.length?rated.reduce((a,t)=>a+t.rating,0)/rated.length:null;
+  const quality=avgRating?avgRating/5:(done.length?0.7:0);
+  const rep=Math.min(1,reports/Math.max(1,ts.length));
+  const score=Math.max(0,Math.min(100,Math.round(100*(0.4*completion+0.25*onTime+0.25*quality+0.1*rep)-5*od.length)));
+  return{...base,score,completion,onTime,avgRating};
+}
+const scoreLabel=s=>s>=80?['Perform','var(--ok)']:s>=60?['Cukup','var(--warn)']:['Perlu perhatian','var(--bad)'];
+
+/* ============ komponen kecil ============ */
+const av=(u,s=28)=>u?`<span class="av" style="--s:${s}px;background:hsl(${hash(u.id)%360} 50% 42%)" title="${esc(u.name)}">${esc(u.name.split(/\s+/).map(x=>x[0]).slice(0,2).join('').toUpperCase())}</span>`:'';
+const chip=(t,c)=>`<span class="chip" style="--c:${c||'var(--mute)'}">${esc(t)}</span>`;
+const sel=(name,opts,val,x='')=>`<select name="${name}" ${x}>${opts.map(([v,l])=>`<option value="${esc(v)}" ${String(v)===String(val)?'selected':''}>${esc(l)}</option>`).join('')}</select>`;
+const divName=id=>Dv(id)?.name||'–';
+const empty=m=>`<div class="muted" style="padding:12px 0">${m}</div>`;
+
+/* ============ views ============ */
+const VIEWS={};
+VIEWS.dashboard=()=>{
+  const me=S.me,mine=S.tasks.filter(t=>t.assigneeId===me.id),act=mine.filter(t=>t.status!=='done');
+  const od=act.filter(isOverdue),su=scopeUserIds();
+  const rev=isMgr()?visibleTasks().filter(t=>t.status==='review'&&su.has(t.assigneeId)):[];
+  const done30=mine.filter(t=>t.status==='done'&&t.doneAt>Date.now()-30*864e5);
+  const cross=visibleTasks().filter(t=>(t.collabDivisionIds||[]).length&&t.status!=='done').slice(0,5);
+  const recent=[...visibleReports()].sort((a,b)=>b.createdAt-a.createdAt).slice(0,6);
+  const row=t=>`<div class="item" data-act="open-task" data-id="${t.id}"><div><b>${esc(t.title)}</b><div class="muted sm">${esc(U(t.assigneeId)?.name||'')} · ${esc(divName(t.divisionId))}</div></div><div class="sm" style="text-align:right">${chip(ST[t.status])}<div class="${isOverdue(t)?'':'muted'}" style="${isOverdue(t)?'color:var(--bad)':''}">${fmtDate(t.due)}</div></div></div>`;
+  const myKpi=kpiFor(me.id,30);
+  return`<div class="h"><h1>Halo, ${esc(me.name.split(' ')[0])} 👋</h1><button class="pri" data-act="new-task">+ Tugas baru</button></div>
+  <div class="grid g4" style="margin-bottom:14px">
+   <div class="card stat"><span class="muted">Tugas aktif saya</span><b>${act.length}</b></div>
+   <div class="card stat"><span class="muted">Terlambat</span><b style="color:${od.length?'var(--bad)':'inherit'}">${od.length}</b></div>
+   <div class="card stat"><span class="muted">${isMgr()?'Menunggu review saya':'Selesai 30 hari'}</span><b>${isMgr()?rev.length:done30.length}</b></div>
+   <div class="card stat"><span class="muted">Skor KPI saya (30 hari)</span><b>${myKpi?.score??'–'}</b>${myKpi?.score!=null?chip(scoreLabel(myKpi.score)[0],scoreLabel(myKpi.score)[1]):''}</div>
+  </div>
+  <div class="grid g2">
+   ${isMgr()?`<div class="card"><h3>Perlu direview</h3>${rev.map(row).join('')||empty('Tidak ada yang menunggu review.')}</div>`:''}
+   <div class="card"><h3>Tugas saya</h3>${act.sort((a,b)=>(a.due||'9').localeCompare(b.due||'9')).slice(0,6).map(row).join('')||empty('Tidak ada tugas aktif.')}</div>
+   <div class="card"><h3>Kerja lintas divisi</h3>${cross.map(t=>`<div class="item" data-act="open-task" data-id="${t.id}"><div><b>${esc(t.title)}</b><div class="muted sm">${esc(divName(t.divisionId))} ↔ ${t.collabDivisionIds.map(divName).map(esc).join(', ')}</div></div>${chip(ST[t.status])}</div>`).join('')||empty('Belum ada tugas lintas divisi.')}</div>
+   <div class="card"><h3>Laporan terbaru</h3>${recent.map(r=>`<div class="item"><div class="row" style="align-items:flex-start">${av(U(r.userId),26)}<div><b>${esc(U(r.userId)?.name||'?')}</b> <span class="muted sm">${ago(r.createdAt)}</span><div>${esc(r.text)}</div></div></div></div>`).join('')||empty('Belum ada laporan.')}</div>
+  </div>`;
+};
+
+function filteredTasks(){
+  const f=S.f,q=f.q.toLowerCase();
+  return visibleTasks().filter(t=>(f.who==='all'||(f.who==='me'?t.assigneeId===S.me.id:t.assigneeId===f.who))&&(f.div==='all'||t.divisionId===f.div||(t.collabDivisionIds||[]).includes(f.div))&&(!q||(t.title+' '+(t.desc||'')).toLowerCase().includes(q)));
+}
+function taskCard(t){
+  const a=U(t.assigneeId),p=PRI[t.priority||'med'];
+  return`<div class="card task" draggable="true" data-act="open-task" data-id="${t.id}">
+   <div class="row sb"><span>${chip(p[0],p[1])} ${isOverdue(t)?chip('Terlambat','var(--bad)'):''}</span>${linkedOf(t).length?`<span class="sm muted" title="Terkait tugas lain">🔗 ${linkedOf(t).length}</span>`:''}</div>
+   <b>${esc(t.title)}</b>
+   <div class="muted sm">${esc(divName(t.divisionId))}${(t.collabDivisionIds||[]).length?' ↔ '+t.collabDivisionIds.map(divName).map(esc).join(', '):''}</div>
+   <div class="row"><div class="bar"><i style="width:${t.progress||0}%"></i></div><span class="sm muted">${t.progress||0}%</span></div>
+   <div class="row sb">${a?`<span class="row sm">${av(a,22)}${esc(a.name.split(' ')[0])}</span>`:'<span></span>'}<span class="sm muted">${fmtDate(t.due)}</span></div></div>`;
+}
+VIEWS.tasks=()=>{
+  const f=S.f,ts=filteredTasks();
+  const people=[['all','Semua orang'],['me','Tugas saya'],...[...scopeUserIds()].map(U).filter(Boolean).map(u=>[u.id,u.name])];
+  const divs=[['all','Semua divisi'],...S.divisions.map(d=>[d.id,d.name])];
+  const body=f.view==='board'
+   ?`<div class="board">${Object.entries(ST).map(([k,l])=>{const c=ts.filter(t=>t.status===k);return`<div class="col" data-col="${k}"><div class="row sb"><b>${l}</b><span class="muted sm">${c.length}</span></div>${c.map(taskCard).join('')}</div>`}).join('')}</div>`
+   :`<div class="card scroll"><table><tr><th>Tugas</th><th>PIC</th><th>Divisi</th><th>Status</th><th>Tenggat</th><th>Progres</th></tr>${ts.map(t=>`<tr data-act="open-task" data-id="${t.id}" style="cursor:pointer"><td><b>${esc(t.title)}</b></td><td>${esc(U(t.assigneeId)?.name||'–')}</td><td>${esc(divName(t.divisionId))}</td><td>${chip(ST[t.status])}</td><td style="${isOverdue(t)?'color:var(--bad)':''}">${fmtDate(t.due)}</td><td>${t.progress||0}%</td></tr>`).join('')||`<tr><td colspan="6">${empty('Tidak ada tugas.')}</td></tr>`}</table></div>`;
+  return`<div class="h"><h1>Tugas</h1><div class="row"><div class="tabs" style="margin:0"><button class="${f.view==='board'?'on':''}" data-act="set-f" data-k="view" data-v="board">Board</button><button class="${f.view==='list'?'on':''}" data-act="set-f" data-k="view" data-v="list">Daftar</button></div><button class="pri" data-act="new-task">+ Tugas baru</button></div></div>
+  <div class="filters"><input id="q" data-f="q" placeholder="Cari tugas…" value="${esc(f.q)}">${sel('who',people,f.who,'data-f="who"')}${sel('div',divs,f.div,'data-f="div"')}</div>${body}`;
+};
+
+VIEWS.reports=()=>{
+  const me=S.me;let rs=visibleReports();
+  if(S.repTab==='me')rs=rs.filter(r=>r.userId===me.id);
+  if(S.repUser!=='all')rs=rs.filter(r=>r.userId===S.repUser);
+  rs=[...rs].sort((a,b)=>b.createdAt-a.createdAt);
+  const people=[['all','Semua orang'],...[...scopeUserIds()].map(U).filter(Boolean).map(u=>[u.id,u.name])];
+  const TY={progress:['Progres','var(--brand)'],daily:['Harian','var(--ok)'],review:['Review','var(--warn)']};
+  return`<div class="h"><h1>Laporan</h1><button class="pri" data-act="new-report">+ Buat laporan</button></div>
+  <div class="filters"><div class="tabs" style="margin:0"><button class="${S.repTab==='all'?'on':''}" data-act="set" data-k="repTab" data-v="all">Semua</button><button class="${S.repTab==='me'?'on':''}" data-act="set" data-k="repTab" data-v="me">Laporan saya</button></div>${isMgr()?sel('repUser',people,S.repUser,'data-s="repUser"'):''}</div>
+  <div class="grid">${rs.map(r=>{const u=U(r.userId),t=S.tasks.find(x=>x.id===r.taskId);const ty=TY[r.type]||TY.progress;return`<div class="card"><div class="row sb"><div class="row">${av(u)}<div><b>${esc(u?.name||'?')}</b><div class="muted sm">${esc(u?.title||'')} · ${ago(r.createdAt)}</div></div></div>${chip(ty[0],ty[1])}</div>
+   ${t?`<div style="margin-top:8px"><a href="#" data-act="open-task" data-id="${t.id}">📋 ${esc(t.title)}</a></div>`:''}
+   <p style="margin:8px 0;white-space:pre-wrap">${esc(r.text)}</p>${r.progress!=null?`<div class="row"><div class="bar"><i style="width:${r.progress}%"></i></div><span class="sm muted">${r.progress}%</span></div>`:''}</div>`}).join('')||empty('Belum ada laporan.')}</div>`;
+};
+
+function personRow(u){
+  const open=S.tasks.filter(t=>t.assigneeId===u.id&&t.status!=='done').length;
+  return`<div class="row sb"><div class="row">${av(u,30)}<div><b>${esc(u.name)}</b><div class="muted sm">${esc(u.title||ROLE[u.role])}${U(u.managerId)?' · atasan: '+esc(U(u.managerId).name):''}</div></div></div><div class="row">${chip(open+' tugas')}<button class="sm" data-act="dm" data-id="${u.id}" title="Chat">💬</button></div></div>`;
+}
+function divCard(d){
+  const mem=S.users.filter(u=>u.divisionId===d.id),head=U(d.headId),open=S.tasks.filter(t=>t.divisionId===d.id&&t.status!=='done').length;
+  return`<div class="card"><div class="row sb"><h3 style="margin:0">${esc(d.name)}</h3>${chip(mem.length+' orang · '+open+' tugas aktif')}</div><div class="muted sm" style="margin:2px 0 10px">Kepala divisi: ${head?esc(head.name):'–'}</div><div class="grid" style="gap:8px">${mem.map(personRow).join('')||'<span class="muted">Belum ada anggota</span>'}</div></div>`;
+}
+const divTree=pid=>S.divisions.filter(d=>(d.parentId||null)===pid).map(d=>`<div style="margin-bottom:12px">${divCard(d)}<div class="tree">${divTree(d.id)}</div></div>`).join('');
+function peopleTree(mid){
+  const kids=S.users.filter(u=>mid===null?(!u.managerId||!U(u.managerId)):u.managerId===mid);
+  return kids.map(u=>`<div style="margin:8px 0"><div class="card" style="padding:8px 12px">${personRow(u)}<div class="muted sm" style="margin-top:2px">Divisi ${esc(divName(u.divisionId))}</div></div><div class="tree">${peopleTree(u.id)}</div></div>`).join('');
+}
+function crossPairs(){
+  const m={};
+  for(const t of visibleTasks())for(const c of t.collabDivisionIds||[]){if(c===t.divisionId)continue;const k=[t.divisionId,c].sort().join('|');(m[k]??=[]).push(t)}
+  return Object.entries(m).sort((a,b)=>b[1].length-a[1].length);
+}
+VIEWS.org=()=>{
+  const tabs=[['div','Per divisi'],['ppl','Hirarki atasan'],['link','Keterkaitan antar divisi']];
+  let body;
+  if(S.orgTab==='div')body=divTree(null)||empty('Belum ada divisi. Admin bisa menambah di menu Admin.');
+  else if(S.orgTab==='ppl')body=peopleTree(null)||empty('Belum ada karyawan.');
+  else body=crossPairs().map(([k,ts])=>{const[a,b]=k.split('|');return`<div class="card" style="margin-bottom:12px"><div class="row sb"><h3 style="margin:0">${esc(divName(a))} ↔ ${esc(divName(b))}</h3>${chip(ts.length+' tugas bersama · '+ts.filter(t=>t.status!=='done').length+' aktif')}</div>${ts.map(t=>`<div class="item" data-act="open-task" data-id="${t.id}"><span>${esc(t.title)} <span class="muted sm">· ${esc(U(t.assigneeId)?.name||'')}</span></span>${chip(ST[t.status])}</div>`).join('')}</div>`}).join('')||empty('Belum ada tugas yang melibatkan lebih dari satu divisi. Tambahkan "Divisi terkait" saat membuat tugas.');
+  return`<div class="h"><h1>Struktur kantor</h1></div><div class="tabs">${tabs.map(([k,l])=>`<button class="${S.orgTab===k?'on':''}" data-act="set" data-k="orgTab" data-v="${k}">${l}</button>`).join('')}</div>${body}`;
+};
+
+VIEWS.kpi=()=>{
+  const ids=isMgr()?[...scopeUserIds()]:[S.me.id];
+  const rows=ids.map(id=>({u:U(id),k:kpiFor(id,S.kpiRange)})).filter(r=>r.u).sort((a,b)=>(b.k?.score??-1)-(a.k?.score??-1));
+  const scored=rows.filter(r=>r.k?.score!=null);
+  const warn=scored.filter(r=>r.k.score<60).length,top=scored[0];
+  const byDiv=S.divisions.map(d=>{const s=scored.filter(r=>r.u.divisionId===d.id);return s.length?{d,avg:Math.round(s.reduce((a,r)=>a+r.k.score,0)/s.length),n:s.length}:null}).filter(Boolean);
+  return`<div class="h"><h1>KPI karyawan</h1><select data-s="kpiRange" style="width:auto"><option value="30" ${S.kpiRange===30?'selected':''}>30 hari terakhir</option><option value="90" ${S.kpiRange===90?'selected':''}>90 hari terakhir</option><option value="0" ${S.kpiRange===0?'selected':''}>Semua waktu</option></select></div>
+  ${isMgr()?`<div class="grid g4" style="margin-bottom:14px"><div class="card stat"><span class="muted">Karyawan dinilai</span><b>${scored.length}</b></div><div class="card stat"><span class="muted">Performa terbaik</span><b style="font-size:18px">${top?esc(top.u.name):'–'}</b>${top?chip(top.k.score,'var(--ok)'):''}</div><div class="card stat"><span class="muted">Perlu perhatian</span><b style="color:${warn?'var(--bad)':'inherit'}">${warn}</b></div>${byDiv.map(x=>`<div class="card stat"><span class="muted">Rata-rata ${esc(x.d.name)}</span><b>${x.avg}</b></div>`).join('')}</div>`:''}
+  <div class="card scroll"><table><tr><th>Karyawan</th><th style="min-width:180px">Skor</th><th>Selesai</th><th>Tepat waktu</th><th>Rating</th><th>Terlambat</th><th>Laporan</th></tr>
+  ${rows.map(({u,k})=>{const lb=k?.score!=null?scoreLabel(k.score):null;return`<tr><td><div class="row">${av(u)}<div><b>${esc(u.name)}</b><div class="muted sm">${esc(u.title||'')} · ${esc(divName(u.divisionId))}</div></div></div></td>
+   <td>${k?lb?`<div class="row"><div class="bar"><i style="width:${k.score}%;background:${lb[1]}"></i></div><b>${k.score}</b></div>${chip(lb[0],lb[1])}`:'<span class="muted sm">Belum cukup data (belum ada tugas jatuh tempo)</span>':'<span class="muted sm">Belum ada tugas</span>'}</td>
+   <td>${k?k.done+'/'+k.total:'–'}</td><td>${k?.onTime!=null?Math.round(k.onTime*100)+'%':'–'}</td><td>${k?.avgRating?k.avgRating.toFixed(1)+' ★':'–'}</td><td style="${k?.overdue?'color:var(--bad)':''}">${k?k.overdue:'–'}</td><td>${k?k.reports:'–'}</td></tr>`}).join('')}</table></div>
+  <p class="muted sm" style="margin-top:12px">Skor = 40% penyelesaian + 25% ketepatan waktu + 25% kualitas (rating atasan 1–5) + 10% keaktifan laporan − 5 poin per tugas terlambat. Hanya tugas yang sudah selesai atau lewat tenggat yang dihitung. Perform ≥ 80, Cukup 60–79, Perlu perhatian &lt; 60.${isMgr()?'':' Staf hanya melihat KPI sendiri.'}</p>`;
+};
+
+VIEWS.admin=()=>{
+  if(!isAdmin())return empty('Hanya admin.');
+  return`<div class="h"><h1>Admin</h1></div>
+  <div class="card" style="margin-bottom:14px"><div class="row sb"><h3 style="margin:0">Divisi</h3><button class="pri sm" data-act="new-div">+ Divisi</button></div><div class="scroll"><table><tr><th>Nama</th><th>Induk</th><th>Kepala</th><th></th></tr>${S.divisions.map(d=>`<tr><td>${esc(d.name)}</td><td>${esc(divName(d.parentId))}</td><td>${esc(U(d.headId)?.name||'–')}</td><td style="text-align:right"><button class="sm" data-act="edit-div" data-id="${d.id}">Edit</button> <button class="sm bad" data-act="del-div" data-id="${d.id}">Hapus</button></td></tr>`).join('')}</table></div></div>
+  <div class="card"><h3>Karyawan</h3><div class="scroll"><table><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Divisi</th><th>Atasan</th><th></th></tr>${S.users.map(u=>`<tr><td>${esc(u.name)}<div class="muted sm">${esc(u.title||'')}</div></td><td class="sm">${esc(u.email)}</td><td>${chip(ROLE[u.role])}</td><td>${u.divisionId?esc(divName(u.divisionId)):chip('Belum ditempatkan','var(--warn)')}</td><td>${esc(U(u.managerId)?.name||'–')}</td><td style="text-align:right"><button class="sm" data-act="edit-user" data-id="${u.id}">Edit</button></td></tr>`).join('')}</table></div>
+  ${store.mode==='demo'?'<p class="muted sm">Mode demo: data tersimpan di browser ini. <a href="#" data-act="reset-demo">Reset data demo</a></p>':''}</div>`;
+};
+
+/* ============ chat ============ */
+const dmPair=o=>[S.me.id,o].sort().join('_');
+function chanSrc(ch){return ch.startsWith('dm:')?[`dms/${dmPair(ch.slice(3))}/messages`,null]:['messages',{where:['channel',ch]}]}
+function chanName(ch){if(ch==='general')return'# Umum';if(ch.startsWith('div:'))return'# '+divName(ch.slice(4));return'💬 '+(U(ch.slice(3))?.name||'?')}
+function chatShell(){
+  const divs=(isAdmin()?S.divisions:S.divisions.filter(d=>scopeDivs().includes(d.id)||d.id===S.me.divisionId));
+  const b=(id,l)=>`<button class="${S.ch===id?'on':''}" data-act="chan" data-id="${id}">${l}</button>`;
+  return`<div class="h"><h1>Chat</h1></div><div class="chat" id="chat-shell"><div class="card chlist" id="chlist">
+   <h4>Channel</h4>${b('general','# Umum')}${divs.map(d=>b('div:'+d.id,'# '+esc(d.name))).join('')}
+   <h4>Pesan langsung</h4>${S.users.filter(u=>u.id!==S.me.id).map(u=>b('dm:'+u.id,av(u,20)+esc(u.name))).join('')}</div>
+   <div class="card chatbox"><div class="row sb" style="padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:8px"><b id="chtitle"></b></div><div class="msgs" id="msgs"></div>
+   <form data-form="chat" class="row"><input name="text" id="chat-input" placeholder="Tulis pesan… (Enter untuk kirim)" autocomplete="off" required><button class="pri">Kirim</button></form></div></div>`;
+}
+function updateChat(){
+  const cl=$('#chlist');if(!cl)return;
+  cl.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.id===S.ch));
+  $('#chtitle').textContent=chanName(S.ch);
+  const box=$('#msgs'),near=box.scrollHeight-box.scrollTop-box.clientHeight<80;
+  const ms=[...S.chat].sort((a,b)=>a.createdAt-b.createdAt);
+  box.innerHTML=ms.map(m=>{const u=U(m.uid);return`<div class="msg">${av(u,32)}<div><b>${esc(u?.name||'?')}</b> <span class="muted sm">${fmtDate(m.createdAt)} ${fmtTime(m.createdAt)}</span><p>${esc(m.text)}</p></div></div>`}).join('')||empty('Belum ada pesan. Mulai percakapan!');
+  if(near)box.scrollTop=box.scrollHeight;
+}
+function subChat(){
+  chatUnsub?.();S.chat=[];
+  const[p,o]=chanSrc(S.ch);
+  chatUnsub=store.sub(p,rows=>{S.chat=rows;updateChat()},o);
+}
+function unsubChat(){chatUnsub?.();chatUnsub=null}
+
+/* ============ modal ============ */
+function openModal(m){S.modal=m;$('#modal').innerHTML=`<div class="back" data-act="close-bg"><div class="dlg">${modalHtml()}</div></div>`}
+function closeModal(){S.modal=null;$('#modal').innerHTML=''}
+function modalHtml(){
+  const m=S.modal;
+  if(m.type==='task'){const t=S.tasks.find(x=>x.id===m.id);return t?taskModal(t):'<p>Tugas tidak ditemukan.</p>'}
+  if(m.type==='taskform')return taskForm(m.id&&S.tasks.find(x=>x.id===m.id));
+  if(m.type==='report')return reportForm(m.taskId);
+  if(m.type==='div')return divForm(m.id&&Dv(m.id));
+  if(m.type==='user')return userForm(U(m.id));
+  return'';
+}
+function keepForm(fn){
+  const root=$('#modal'),vals={};root.querySelectorAll('[name]').forEach(e=>vals[e.name]=e.value);
+  const ae=document.activeElement?.name;fn();
+  root.querySelectorAll('[name]').forEach(e=>{if(vals[e.name]!==undefined&&e.type!=='hidden')e.value=vals[e.name]});
+  if(ae)root.querySelector(`[name="${ae}"]`)?.focus();
+}
+function taskModal(t){
+  const me=S.me,a=U(t.assigneeId),isA=t.assigneeId===me.id,mgr=canManage(t);
+  const reps=S.reports.filter(r=>r.taskId===t.id).sort((x,y)=>x.createdAt-y.createdAt),links=linkedOf(t);
+  const stBtn=(to,l,cls='')=>`<button class="${cls}" data-act="status" data-id="${t.id}" data-to="${to}">${l}</button>`;
+  let act='';
+  if(t.status==='todo'&&(isA||mgr))act+=stBtn('doing','▶ Mulai kerjakan','pri');
+  if(t.status==='doing'&&(isA||mgr))act+=stBtn('review','✔ Ajukan review','pri');
+  if(t.status==='review'&&isA&&!mgr)act+=stBtn('doing','↩ Tarik kembali');
+  if(t.status==='done'&&mgr)act+=stBtn('doing','Buka kembali');
+  const review=t.status==='review'&&mgr?`<form data-form="review" data-id="${t.id}" class="card" style="margin-top:12px"><h3>Review atasan</h3><div class="frm2"><div><label>Rating kualitas</label>${sel('rating',[[5,'5 – Sangat baik'],[4,'4 – Baik'],[3,'3 – Cukup'],[2,'2 – Kurang'],[1,'1 – Buruk']],4)}</div></div><label>Catatan</label><textarea name="note" placeholder="Catatan untuk yang mengerjakan"></textarea><div class="row" style="margin-top:8px"><button class="pri" value="approve">Setujui &amp; selesai</button><button value="revise">Minta revisi</button></div></form>`:'';
+  const TY={progress:'📈',daily:'🗓',review:'🧐'};
+  return`<div class="row sb" style="align-items:flex-start"><div><h2 style="margin:0">${esc(t.title)}</h2><div class="row wrap" style="margin-top:6px">${chip(ST[t.status],'var(--brand)')}${chip(PRI[t.priority||'med'][0],PRI[t.priority||'med'][1])}${isOverdue(t)?chip('Terlambat','var(--bad)'):''}${t.rating?chip('Rating '+t.rating+' ★','var(--ok)'):''}</div></div><button data-act="close">✕</button></div>
+  <div class="frm2" style="margin:12px 0"><div><span class="muted sm">PIC</span><div class="row">${av(a,24)}${esc(a?.name||'–')}</div></div><div><span class="muted sm">Dibuat oleh</span><div>${esc(U(t.creatorId)?.name||'–')}</div></div><div><span class="muted sm">Divisi</span><div>${esc(divName(t.divisionId))}</div></div><div><span class="muted sm">Tenggat</span><div>${fmtDate(t.due)}</div></div></div>
+  ${(t.collabDivisionIds||[]).length?`<div class="muted sm">Divisi terkait</div><div class="row wrap" style="margin-bottom:8px">${t.collabDivisionIds.map(d=>chip('↔ '+divName(d),'var(--brand)')).join('')}</div>`:''}
+  ${t.desc?`<p style="white-space:pre-wrap">${esc(t.desc)}</p>`:''}
+  <div class="row"><div class="bar"><i style="width:${t.progress||0}%"></i></div><b>${t.progress||0}%</b></div>
+  ${links.length?`<h3 style="margin-top:14px">Tugas terkait</h3>${links.map(l=>`<div class="item" data-act="open-task" data-id="${l.id}"><span>🔗 ${esc(l.title)} <span class="muted sm">· ${esc(U(l.assigneeId)?.name||'')}</span></span>${chip(ST[l.status])}</div>`).join('')}`:''}
+  <div class="row wrap" style="margin-top:14px">${act}${canEdit(t)?`<button data-act="edit-task" data-id="${t.id}">Edit</button><button class="bad" data-act="del-task" data-id="${t.id}">Hapus</button>`:''}</div>
+  ${review}
+  <h3 style="margin-top:18px">Laporan &amp; progres</h3>
+  ${reps.map(r=>`<div class="item"><div class="row" style="align-items:flex-start">${av(U(r.userId),26)}<div><b>${esc(U(r.userId)?.name||'?')}</b> <span class="muted sm">${TY[r.type]||''} ${ago(r.createdAt)}${r.progress!=null?' · '+r.progress+'%':''}</span><div style="white-space:pre-wrap">${esc(r.text)}</div></div></div></div>`).join('')||empty('Belum ada laporan.')}
+  <form data-form="report" style="margin-top:10px"><input type="hidden" name="taskId" value="${t.id}"><label>Progres: <output>${t.progress||0}%</output></label><input type="range" name="progress" min="0" max="100" step="5" value="${t.progress||0}" oninput="this.previousElementSibling.querySelector('output').value=this.value+'%'"><label>Laporan</label><textarea name="text" required placeholder="Apa yang sudah dikerjakan / kendala?"></textarea><div style="margin-top:8px"><button class="pri">Kirim laporan</button></div></form>`;
+}
+function taskForm(t){
+  const mgr=isMgr(),su=[...scopeUserIds()].map(U).filter(Boolean);
+  const people=mgr?su:[S.me];
+  const cur=t||{assigneeId:S.me.id,divisionId:S.me.divisionId,priority:'med',collabDivisionIds:[],linkedTaskIds:[]};
+  return`<div class="row sb"><h2 style="margin:0">${t?'Edit tugas':'Tugas baru'}</h2><button data-act="close">✕</button></div>
+  <form data-form="task" data-id="${t?.id||''}"><label>Judul</label><input name="title" required value="${esc(cur.title||'')}"><label>Deskripsi</label><textarea name="desc">${esc(cur.desc||'')}</textarea>
+  <div class="frm2"><div><label>PIC</label>${sel('assigneeId',people.map(u=>[u.id,u.name+(u.title?' – '+u.title:'')]),cur.assigneeId)}</div><div><label>Divisi</label>${sel('divisionId',S.divisions.map(d=>[d.id,d.name]),cur.divisionId||'')}</div>
+  <div><label>Prioritas</label>${sel('priority',[['low','Rendah'],['med','Sedang'],['high','Tinggi']],cur.priority||'med')}</div><div><label>Tenggat</label><input type="date" name="due" value="${esc(cur.due||'')}"></div></div>
+  <label>Divisi terkait (kolaborasi lintas divisi)</label><div class="checks">${S.divisions.map(d=>`<label><input type="checkbox" name="collab" value="${d.id}" ${(cur.collabDivisionIds||[]).includes(d.id)?'checked':''}> ${esc(d.name)}</label>`).join('')}</div>
+  <label>Terkait tugas lain (tahan Ctrl/Cmd untuk pilih banyak)</label><select name="linked" multiple size="5">${visibleTasks().filter(x=>x.id!==t?.id).map(x=>`<option value="${x.id}" ${(cur.linkedTaskIds||[]).includes(x.id)?'selected':''}>${esc(x.title)} (${esc(U(x.assigneeId)?.name||'')})</option>`).join('')}</select>
+  <div class="row" style="margin-top:14px"><button class="pri">Simpan</button><button type="button" data-act="close">Batal</button></div></form>`;
+}
+function reportForm(taskId){
+  const mine=S.tasks.filter(t=>t.assigneeId===S.me.id&&t.status!=='done');
+  return`<div class="row sb"><h2 style="margin:0">Buat laporan</h2><button data-act="close">✕</button></div><form data-form="report"><label>Terkait tugas (opsional – kosong = laporan harian)</label>${sel('taskId',[['','Laporan harian umum'],...mine.map(t=>[t.id,t.title])],taskId||'')}<label>Progres tugas (%)</label><input type="number" name="progress" min="0" max="100" placeholder="kosongkan jika laporan harian"><label>Isi laporan</label><textarea name="text" required></textarea><div class="row" style="margin-top:14px"><button class="pri">Kirim</button><button type="button" data-act="close">Batal</button></div></form>`;
+}
+function divForm(d){
+  return`<div class="row sb"><h2 style="margin:0">${d?'Edit':'Tambah'} divisi</h2><button data-act="close">✕</button></div><form data-form="division" data-id="${d?.id||''}"><label>Nama divisi</label><input name="name" required value="${esc(d?.name||'')}"><label>Divisi induk</label>${sel('parentId',[['','– (tingkat teratas)'],...S.divisions.filter(x=>x.id!==d?.id).map(x=>[x.id,x.name])],d?.parentId||'')}<label>Kepala divisi</label>${sel('headId',[['','–'],...S.users.map(u=>[u.id,u.name])],d?.headId||'')}<div class="row" style="margin-top:14px"><button class="pri">Simpan</button><button type="button" data-act="close">Batal</button></div></form>`;
+}
+function userForm(u){
+  return`<div class="row sb"><h2 style="margin:0">Edit karyawan</h2><button data-act="close">✕</button></div><form data-form="user" data-id="${u.id}"><label>Nama</label><input name="name" required value="${esc(u.name)}"><label>Jabatan</label><input name="title" value="${esc(u.title||'')}"><div class="frm2"><div><label>Peran</label>${sel('role',[['staff','Staf'],['manager','Atasan'],['admin','Admin']],u.role)}</div><div><label>Divisi</label>${sel('divisionId',[['','– belum ditempatkan'],...S.divisions.map(d=>[d.id,d.name])],u.divisionId||'')}</div></div><label>Atasan langsung</label>${sel('managerId',[['','–'],...S.users.filter(x=>x.id!==u.id).map(x=>[x.id,x.name])],u.managerId||'')}<div class="row" style="margin-top:14px"><button class="pri">Simpan</button><button type="button" data-act="close">Batal</button></div></form>`;
+}
+
+/* ============ shell & render ============ */
+const NAV=[['dashboard','🏠','Dashboard'],['tasks','📋','Tugas'],['reports','📝','Laporan'],['org','🏢','Struktur'],['chat','💬','Chat'],['kpi','📈','KPI']];
+function navHtml(){const r=route();return[...NAV,...(isAdmin()?[['admin','⚙️','Admin']]:[])].map(([k,i,l])=>`<a href="#/${k}" class="${r===k?'on':''}">${i} ${l}</a>`).join('')}
+function renderAuth(){
+  if(S.auth&&!S.me){$('#app').innerHTML='<div class="login"><div class="card">Menyiapkan akun…</div></div>';return}
+  if($('#login-form'))return;
+  const demo=store.mode==='demo';
+  $('#app').innerHTML=`<div class="login"><div class="card"><h1 style="margin-bottom:4px">Lapak Office</h1><p class="muted" style="margin-top:0">Kerja tim, tugas, laporan, dan KPI dalam satu tempat.</p>
+  ${demo?`<div class="banner sm">Mode demo: data tersimpan di browser ini saja. Isi <code>firebase-config.js</code> untuk memakai Firestore. Pilih akun untuk masuk:</div><div class="grid" style="gap:6px">${store.demoUsers().map(u=>`<button data-act="login-demo" data-email="${esc(u.email)}" style="text-align:left">${esc(u.name)} <span class="muted sm">· ${esc(u.title)} · ${ROLE[u.role]}</span></button>`).join('')}</div>`
+  :`<form id="login-form" data-form="login"><label>Nama (untuk pendaftaran)</label><input name="name" autocomplete="name"><label>Email</label><input type="email" name="email" required autocomplete="email"><label>Password</label><input type="password" name="password" required minlength="6" autocomplete="current-password"><div class="row" style="margin-top:14px"><button class="pri" value="login">Masuk</button><button value="register">Daftar</button></div><p class="muted sm">Akun pertama yang terdaftar otomatis menjadi admin.</p></form>`}</div></div>`;
+}
+function render(){
+  if(!S.auth||!S.me)return renderAuth();
+  if(!$('#main')){$('#app').innerHTML=`<div class="shell"><aside class="side"><div class="brand">🏢 Lapak Office</div><nav class="nav" id="nav"></nav><div class="me row">${''}<div id="meBox" class="row"></div></div></aside><main id="main"></main></div>`}
+  $('#nav').innerHTML=navHtml();
+  $('#meBox').innerHTML=`${av(S.me,30)}<div class="sm"><b>${esc(S.me.name)}</b><div class="muted">${ROLE[S.me.role]} · <a href="#" data-act="logout">Keluar</a></div></div>`;
+  const r=route();
+  if(r==='chat'){if(!$('#chat-shell')){$('#main').innerHTML=chatShell();subChat()}else{updateChat()}}
+  else{unsubChat();const banner=(!S.me.divisionId&&!isAdmin())?'<div class="banner">Akun kamu belum ditempatkan di divisi. Hubungi admin agar bisa mengatur divisi dan atasan langsung kamu.</div>':'';$('#main').innerHTML=banner+(VIEWS[r]||VIEWS.dashboard)()}
+  if(S.modal?.type==='task')keepForm(()=>{$('#modal .dlg').innerHTML=modalHtml()});
+}
+
+/* ============ aksi ============ */
+async function setStatus(t,to,extra={}){
+  const p={status:to,updatedAt:Date.now(),...extra};
+  if(to==='done')p.doneAt=Date.now();else if(t.status==='done'){p.doneAt=null;p.rating=null}
+  if(to==='doing'&&!t.startedAt)p.startedAt=Date.now();
+  await store.update('tasks',t.id,p);
+}
+const act={
+  'open-task':(d)=>openModal({type:'task',id:d.id}),
+  'new-task':()=>openModal({type:'taskform'}),
+  'edit-task':d=>openModal({type:'taskform',id:d.id}),
+  'del-task':async d=>{if(confirm('Hapus tugas ini?')){await store.del('tasks',d.id);closeModal()}},
+  'new-report':()=>openModal({type:'report'}),
+  'status':async d=>{const t=S.tasks.find(x=>x.id===d.id);if(!canMove(t,d.to))return toast('Tidak punya izin untuk memindahkan tugas ini');await setStatus(t,d.to)},
+  'close':closeModal,
+  'close-bg':(d,e)=>{if(e.target.classList.contains('back'))closeModal()},
+  'set':d=>{S[d.k]=d.v;render()},
+  'set-f':d=>{S.f[d.k]=d.v;render()},
+  'dm':d=>{S.ch='dm:'+d.id;S.chat=[];unsubChat();if(route()==='chat'){subChat();render()}else location.hash='#/chat'},
+  'chan':d=>{S.ch=d.id;subChat();updateChat()},
+  'logout':()=>store.logout(),
+  'login-demo':d=>store.login(d.email),
+  'new-div':()=>openModal({type:'div'}),
+  'edit-div':d=>openModal({type:'div',id:d.id}),
+  'del-div':async d=>{if(S.users.some(u=>u.divisionId===d.id)||S.tasks.some(t=>t.divisionId===d.id))return toast('Divisi masih punya anggota/tugas');if(confirm('Hapus divisi?'))await store.del('divisions',d.id)},
+  'edit-user':d=>openModal({type:'user',id:d.id}),
+  'reset-demo':()=>{if(confirm('Reset semua data demo?'))store.reset()},
+};
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const fn=act[el.dataset.act];if(!fn)return;
+  if(el.tagName==='A')e.preventDefault();
+  if(el.dataset.act==='open-task'&&e.target.closest('button,select,input,a[data-act]:not([data-act="open-task"])')&&e.target.closest('button'))return;
+  Promise.resolve(fn(el.dataset,e)).catch(err=>toast(err.message));
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.f&&t.tagName==='SELECT'){S.f[t.dataset.f]=t.value;render()}
+  if(t.dataset.s){S[t.dataset.s]=t.dataset.s==='kpiRange'?+t.value:t.value;render()}
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.f==='q'){S.f.q=t.value;render();const q=$('#q');q.focus();q.setSelectionRange(t.value.length,t.value.length)}
+});
+/* drag & drop board */
+document.addEventListener('dragstart',e=>{const c=e.target.closest?.('.task');if(c)e.dataTransfer.setData('text/plain',c.dataset.id)});
+document.addEventListener('dragover',e=>{const c=e.target.closest?.('.col');if(c){e.preventDefault();c.classList.add('over')}});
+document.addEventListener('dragleave',e=>e.target.closest?.('.col')?.classList.remove('over'));
+document.addEventListener('drop',async e=>{
+  const c=e.target.closest?.('.col');if(!c)return;e.preventDefault();c.classList.remove('over');
+  const t=S.tasks.find(x=>x.id===e.dataTransfer.getData('text/plain')),to=c.dataset.col;
+  if(!t||t.status===to)return;
+  if(to==='done'){if(canManage(t))return openModal({type:'task',id:t.id}),toast('Setujui lewat detail tugas (beri rating)');return toast('Hanya atasan yang bisa menyelesaikan tugas')}
+  if(!canMove(t,to))return toast('Tidak punya izin untuk memindahkan tugas ini');
+  await setStatus(t,to);
+});
+
+/* submit form */
+document.addEventListener('submit',async e=>{
+  const f=e.target.closest('form[data-form]');if(!f)return;e.preventDefault();
+  const fd=new FormData(f),g=k=>(fd.get(k)||'').toString().trim(),kind=f.dataset.form,id=f.dataset.id;
+  try{
+    if(kind==='login'){
+      const mode=e.submitter?.value||'login';
+      if(mode==='register'){S.pendingName=g('name');await store.register(g('email'),g('password'))}else await store.login(g('email'),g('password'));
+    }
+    else if(kind==='chat'){
+      const text=g('text');if(!text)return;f.reset();
+      const[p]=chanSrc(S.ch);
+      await store.add(p,S.ch.startsWith('dm:')?{uid:S.me.id,text}:{uid:S.me.id,text,channel:S.ch});
+    }
+    else if(kind==='task'){
+      const data={title:g('title'),desc:g('desc'),assigneeId:g('assigneeId'),divisionId:g('divisionId')||U(g('assigneeId'))?.divisionId||null,priority:g('priority'),due:g('due'),collabDivisionIds:fd.getAll('collab'),linkedTaskIds:fd.getAll('linked'),updatedAt:Date.now()};
+      if(id)await store.update('tasks',id,data);
+      else await store.add('tasks',{...data,status:'todo',progress:0,creatorId:S.me.id,rating:null,doneAt:null});
+      closeModal();toast('Tugas disimpan');
+    }
+    else if(kind==='report'){
+      const taskId=g('taskId')||null,txt=g('text'),pr=g('progress');
+      const progress=pr===''?null:Math.max(0,Math.min(100,+pr));
+      await store.add('reports',{taskId,userId:S.me.id,type:taskId?'progress':'daily',text:txt,progress});
+      if(taskId&&progress!=null)await store.update('tasks',taskId,{progress,updatedAt:Date.now()});
+      if(S.modal?.type==='report')closeModal();else f.reset();
+      toast('Laporan terkirim');
+    }
+    else if(kind==='review'){
+      const t=S.tasks.find(x=>x.id===id),approve=e.submitter?.value==='approve',note=g('note');
+      if(approve)await setStatus(t,'done',{rating:+g('rating'),progress:100});else await setStatus(t,'doing');
+      await store.add('reports',{taskId:id,userId:S.me.id,type:'review',text:(approve?`Disetujui (rating ${g('rating')}/5). `:'Perlu revisi. ')+note,progress:approve?100:null});
+    }
+    else if(kind==='division'){
+      const d={name:g('name'),parentId:g('parentId')||null,headId:g('headId')||null};
+      if(id)await store.update('divisions',id,d);else await store.add('divisions',d);closeModal();
+    }
+    else if(kind==='user'){
+      await store.update('users',id,{name:g('name'),title:g('title'),role:g('role'),divisionId:g('divisionId')||null,managerId:g('managerId')||null});closeModal();
+    }
+  }catch(err){console.error(err);toast(err.code==='permission-denied'?'Ditolak oleh aturan keamanan Firestore':(err.message||'Terjadi kesalahan'))}
+});
+
+/* ============ boot ============ */
+function stopSubs(){unsubs.forEach(u=>u());unsubs=[]}
+function startSubs(){
+  stopSubs();
+  unsubs.push(store.sub('users',async rows=>{
+    S.users=rows;S.me=rows.find(u=>u.id===S.auth?.uid)||null;
+    if(S.auth&&!S.me&&!creating){
+      creating=true;
+      const p={email:S.auth.email||'',name:S.pendingName||(S.auth.email||'User').split('@')[0],role:rows.length?'staff':'admin',divisionId:null,managerId:null,title:''};
+      try{rows.length?await store.set('users',S.auth.uid,p):await store.bootstrapAdmin(S.auth.uid,p)}catch(err){console.error(err);toast('Gagal membuat profil: '+(err.code||err.message))}
+      creating=false;
+    }
+    sched();
+  }));
+  for(const c of['divisions','tasks','reports'])unsubs.push(store.sub(c,rows=>{S[c]=rows;sched()}));
+}
+store.onAuth(au=>{
+  S.auth=au;
+  if(!au){stopSubs();unsubChat();S.me=null;$('#app').innerHTML='';closeModal();renderAuth();return}
+  startSubs();render();
+});
+window.addEventListener('hashchange',()=>{closeModal();render()});
+</script>
+</body>
+</html>
